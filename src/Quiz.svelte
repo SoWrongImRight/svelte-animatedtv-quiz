@@ -8,22 +8,16 @@
 
   import Modal from "./Modal.svelte";
 
+  import { score } from "./store";
+
   let activeQuestion = 0;
 
-  let score = 0;
-  
+    
   let quiz = getQuiz();
 
   let isModalOpen = false;
 
-  function pickAnswer(answer) {
-    if(answer === correctAnswer) {
-      return result = "Correct!"
-    }
-    result = "Incorrect"
-  }
-
-  async function getQuiz() {
+async function getQuiz() {
     const res = await fetch('https://opentdb.com/api.php?amount=10&category=32&type=multiple')
     const quiz = await res.json();
     return quiz;
@@ -35,16 +29,12 @@
 
   function resetQuiz() {
     isModalOpen = false;
-    score = 0;
+    score.set(0); 
     quiz = getQuiz();
     activeQuestion = 0;
   }
 
-  function addToScore() {
-    score = score + 1;
-  }
-
-  $: if(score > 1) {
+  $: if($score > 2) {
     isModalOpen = true;
   }
 
@@ -53,9 +43,13 @@
 </script>
 
 <style>
-
+   
   .fade-wrapper {
     position: absolute;
+  }
+
+  .container {
+    min-height: 500px;
   }
 
 </style>
@@ -64,29 +58,30 @@
 
   <button on:click={resetQuiz}>Start New Quiz</button>
 
-  <h3>My Score: {score}</h3>
+  <h3>My Score: {$score}</h3>
   <h4>Question #{actualQuestion} of 10</h4>
-   
-  {#await quiz}
-    Loading...
-  {:then data}
-    
-    {#each data.results as question, index}
-      {#if index === activeQuestion}
-        <div in:fly={{x:100}} out:fly={{x:-200}} class="fade-wrapper">  
-          <Question {addToScore} {nextQuestion} {question} />
-        </div>
-      {/if}
-    {/each}
   
-  {/await}
+  <div class="container">
+    {#await quiz}
+      Loading...
+    {:then data}
+      
+      {#each data.results as question, index}
+        {#if index === activeQuestion}
+          <div in:fly={{x:100}} out:fly={{x:-200}} class="fade-wrapper">  
+            <Question {nextQuestion} {question} />
+          </div>
+        {/if}
+      {/each}
+    
+    {/await}
 
 
 
+  </div>
 </div>
-
 {#if isModalOpen}
-  <Modal>
+  <Modal on:close={resetQuiz}>
     <h2>You won!</h2>
     <p>Congratulations</p>
     <button on:click={resetQuiz}>Start Over</button>

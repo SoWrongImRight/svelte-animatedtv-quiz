@@ -1,7 +1,10 @@
 <script>
+
+  import { score } from "./store";
+
   export let question;
   export let nextQuestion;
-  export let addToScore;
+ 
 
   let isCorrect;
   let isAnswered = false;
@@ -31,7 +34,7 @@
       isAnswered = true;
       isCorrect = correct;
       if(correct){
-        addToScore();
+        score.update(val => val + 1)
       }
     }
   }
@@ -50,6 +53,10 @@
     color: green;
   }
 
+  .answer {
+    display: block;
+  }
+
 </style>
 
 <h3>{@html question.question}</h3>
@@ -66,7 +73,7 @@
 
 
 {#each allAnswers as answer}
-  <button disabled={isAnswered} on:click={ () => checkQuestion(answer.correct) }>
+  <button class="answer" disabled={isAnswered} on:click={ () => checkQuestion(answer.correct) }>
     {@html answer.answer}
   </button>
 {/each}
