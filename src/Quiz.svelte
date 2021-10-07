@@ -6,11 +6,15 @@
 
   import Question from "./Question.svelte";
 
+  import Modal from "./Modal.svelte";
+
   let activeQuestion = 0;
 
   let score = 0;
   
   let quiz = getQuiz();
+
+  let isModalOpen = false;
 
   function pickAnswer(answer) {
     if(answer === correctAnswer) {
@@ -30,6 +34,7 @@
   }
 
   function resetQuiz() {
+    isModalOpen = false;
     score = 0;
     quiz = getQuiz();
     activeQuestion = 0;
@@ -39,9 +44,8 @@
     score = score + 1;
   }
 
-  $: if(score > 7) {
-    alert('You won!');
-    resetQuiz();
+  $: if(score > 1) {
+    isModalOpen = true;
   }
 
   $: actualQuestion = activeQuestion + 1;
@@ -81,3 +85,10 @@
 
 </div>
 
+{#if isModalOpen}
+  <Modal>
+    <h2>You won!</h2>
+    <p>Congratulations</p>
+    <button on:click={resetQuiz}>Start Over</button>
+  </Modal>
+{/if}
